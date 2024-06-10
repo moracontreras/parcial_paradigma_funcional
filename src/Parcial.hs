@@ -30,7 +30,10 @@ jugar :: Ejercicio
 jugar unPerro = modificarEnergia sacarHasta10 unPerro
 
 sacarHasta10 :: Int->Int
-sacarHasta10 energia= subtract (min 10 energia) energia
+sacarHasta10 energia= max 0. sacar10 $ energia
+
+sacar10 :: Int->Int
+sacar10 energia = subtract 10 energia
 
 ladrar :: Int->Ejercicio
 ladrar ladridos unPerro = modificarEnergia (aumentarMitad ladridos) unPerro
@@ -73,8 +76,11 @@ perderPrimerJuguete unPerro = modificarJuguetesFavoritos tail unPerro
 zara :: Perro
 zara = UnPerro "Dalmata" ["Pelota","Mantita"] 90 80
 
+ramon :: Perro
+ramon = UnPerro "Dalmata" ["Peluche","Pelota","Mantita","Peine"] 20000 20
+
 guarderiaPdePerritos :: Guarderia
-guarderiaPdePerritos = UnaGuarderia "GuarderíPdePerritos" [(jugar,30),(ladrar 18,20),(regalar "Pelota",0),(diaDeSpa,120),(diaDeCampo,720)]
+guarderiaPdePerritos = UnaGuarderia "GuarderíaPdePerritos" [(jugar,30),(ladrar 18,20),(regalar "Pelota",0),(diaDeSpa,120),(diaDeCampo,720)]
 
 puedeEstarEnUnaGuarderia :: Perro->Guarderia->Bool
 puedeEstarEnUnaGuarderia (UnPerro _ _ tiempoAPermanecer _) (UnaGuarderia _ rutina) = (tiempoAPermanecer >=).tiempoTotalRutina $ rutina
@@ -100,7 +106,7 @@ realizarRutina unPerro unaGuarderia
     | otherwise = unPerro
 
 hacerRutina :: Perro->[Actividad]->Perro
-hacerRutina unPerro unaRutina = foldr ($) unPerro. ejerciciosRutina $ unaRutina
+hacerRutina unPerro unaRutina = foldl (\perro ejercicio -> ejercicio perro) unPerro. ejerciciosRutina $ unaRutina
 
 ejerciciosRutina :: [Actividad]->[Ejercicio]
 ejerciciosRutina unaRutina = map  fst unaRutina 
@@ -113,3 +119,56 @@ quedaCansadoPostRutina unaGuarderia unPerro = tieneEnergiaMenorA5.flip realizarR
 
 tieneEnergiaMenorA5 :: Perro->Bool
 tieneEnergiaMenorA5 (UnPerro _ _ _ energia)= energia <5
+
+piPerro :: Perro
+piPerro = UnPerro "Labrador" infinitasSoguitas 314 159
+--uso piPerro en lugar de pi, ya que sino la consola intenta usar la constante numérica pi
+
+infinitasSoguitas :: [Juguete]
+infinitasSoguitas = map soguita [1..]
+
+soguita :: Int->Juguete
+soguita unNumero= "Soguita " ++ show unNumero
+
+{-
+1) Es posible saber si piPerro es de raza extravagante, ya que, como Haskell usa Lazy Evaluation, 
+primero evalúa la función para saber qué necesita del parámetro y luego la aplica. Así, la función solo
+debe considerar la raza del perro, por lo que no necesita analizar los juguetes, los cuales son una lista infinita.
+
+ghci> esDeRazaExtravagante piPerro
+False
+
+2)a. Al intentar saber si dentro de la lista de juguetes de piPerro, la cual es una lista infinita, se encuentra
+"Huesito", el programa se quedará evaluando infinitamente uno por uno los elementos de la lista hasta encontrarlo.
+Si "Huesito" sí formara parte de la lista, entonces daría True.
+
+elem "Huesito". juguetesFavoritos $ piPerro
+Interrupted.
+
+b. Ocurriría lo mismo que en el item b.
+
+ghci> elem "Pelota".juguetesFavoritos.flip realizarRutina guarderiaPdePerritos $ piPerro
+Interrupted.
+
+c. El programa evalúa la lista infinita hasta encontrar "Soguita 31112". Como la encuentra, no se 
+queda procesando el resto de la lista, sino que devuelve True.
+
+elem "Soguita 31112". juguetesFavoritos $ piPerro      
+True
+
+3) Es posible que piPerro realice una rutina, ya que hacerlo no implica tener que evaluar la lista infinita de juguetes.
+Regalar es el único ejercicio que utiliza la lista de juguetes favoritos de piPerro y ni siquiera debe evaluarla, sino que agrega un 
+juguete al inicio de dicha lista.
+El programa debe devolver a piPerro
+
+ghci> realizarRutina piPerro guarderiaPdePerritos
+UnPerro {raza = "Labrador", juguetesFavoritos = ["Soguita 1","Soguita 2","Soguita 3","Soguita 4", Interrupted.
+
+4)La funcion regalar agrega un juguete al comienzo de la lista de juguetes. Por eso, 
+puede agregar un juguete en los juguetes favoritos de piPerro. Si el juguete se agregara al final,
+entonces el programa quedaría procesando la lista infinita indefinidamente ya que no llegará al final.
+
+ghci> regalar "Hueso" piPerro
+UnPerro {raza = "Labrador", juguetesFavoritos = ["Hueso","Soguita 1","Soguita 2","Soguita 3",Interrupted.
+
+-}
