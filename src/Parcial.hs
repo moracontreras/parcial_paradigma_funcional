@@ -139,7 +139,8 @@ ghci> esDeRazaExtravagante piPerro
 False
 
 2)a. Al intentar saber si dentro de la lista de juguetes de piPerro, la cual es una lista infinita, se encuentra
-"Huesito", el programa se quedará evaluando infinitamente uno por uno los elementos de la lista hasta encontrarlo.
+"Huesito", el programa se quedará evaluando indefinidamente uno por uno los elementos de la lista hasta encontrarlo 
+o hasta terminar de recorrer la lista.
 Si "Huesito" sí formara parte de la lista, entonces daría True.
 
 elem "Huesito". juguetesFavoritos $ piPerro
@@ -150,23 +151,25 @@ b. Ocurriría lo mismo que en el item b.
 ghci> elem "Pelota".juguetesFavoritos.flip realizarRutina guarderiaPdePerritos $ piPerro
 Interrupted.
 
-c. El programa evalúa la lista infinita hasta encontrar "Soguita 31112". Como la encuentra, no se 
-queda procesando el resto de la lista, sino que devuelve True.
+c. El programa evalúa la lista infinita hasta encontrar "Soguita 31112". Como dicho juguete pertenece a la lista, al encontrarlo no se 
+queda procesando el resto de la lista, sino que ya devuelve True.
 
 elem "Soguita 31112". juguetesFavoritos $ piPerro      
 True
 
 3) Es posible que piPerro realice una rutina, ya que hacerlo no implica tener que evaluar la lista infinita de juguetes.
-Regalar es el único ejercicio que utiliza la lista de juguetes favoritos de piPerro y ni siquiera debe evaluarla, sino que agrega un 
-juguete al inicio de dicha lista.
-El programa debe devolver a piPerro
+Regalar es el único ejercicio que utiliza la lista de juguetes favoritos de piPerro y ni siquiera debe evaluarla, 
+sino que agrega un juguete al inicio de dicha lista.
+El programa hará que piPerro realice la rutina y al devolver piPerro modificado queda indefinidamente
+devolviendo juguetes de la lista de juguetes favoritos.
 
 ghci> realizarRutina piPerro guarderiaPdePerritos
 UnPerro {raza = "Labrador", juguetesFavoritos = ["Soguita 1","Soguita 2","Soguita 3","Soguita 4", Interrupted.
 
 4)La funcion regalar agrega un juguete al comienzo de la lista de juguetes. Por eso, 
 puede agregar un juguete en los juguetes favoritos de piPerro. Si el juguete se agregara al final,
-entonces el programa quedaría procesando la lista infinita indefinidamente ya que no llegará al final.
+entonces el programa quedaría procesando la lista infinita indefinidamente ya que no llegará al final donde debería
+colocar el juguete nuevo.
 
 ghci> regalar "Hueso" piPerro
 UnPerro {raza = "Labrador", juguetesFavoritos = ["Hueso","Soguita 1","Soguita 2","Soguita 3",Interrupted.
