@@ -62,7 +62,7 @@ esDeRazaExtravaganteOPermaneceAlMenos50Minutos :: Perro->Bool
 esDeRazaExtravaganteOPermaneceAlMenos50Minutos unPerro = esDeRazaExtravagante unPerro || permaneceAlMenos50Minutos unPerro
 
 esDeRazaExtravagante:: Perro->Bool
-esDeRazaExtravagante unPerro = flip elem ["Dalmata","Pomerania"].raza $ unPerro
+esDeRazaExtravagante unPerro = flip elem ["Dálmata","Pomerania"].raza $ unPerro
 
 permaneceAlMenos50Minutos :: Perro->Bool
 permaneceAlMenos50Minutos unPerro = (>= 50).tiempo $ unPerro
@@ -71,13 +71,15 @@ diaDeCampo :: Ejercicio
 diaDeCampo unPerro = perderPrimerJuguete.jugar $ unPerro
 
 perderPrimerJuguete :: Perro->Perro
-perderPrimerJuguete unPerro = modificarJuguetesFavoritos tail unPerro
+perderPrimerJuguete unPerro 
+    | null.juguetesFavoritos $ unPerro = unPerro
+    | otherwise =  modificarJuguetesFavoritos tail unPerro
 
 zara :: Perro
-zara = UnPerro "Dalmata" ["Pelota","Mantita"] 90 80
+zara = UnPerro "Dálmata" ["Pelota","Mantita"] 90 80
 
 ramon :: Perro
-ramon = UnPerro "Dalmata" ["Peluche","Pelota","Mantita","Peine"] 20000 20
+ramon = UnPerro "Yorki" ["Peluche","Pelota","Mantita","Peine"] 20000 5
 
 guarderiaPdePerritos :: Guarderia
 guarderiaPdePerritos = UnaGuarderia "GuarderíaPdePerritos" [(jugar,30),(ladrar 18,20),(regalar "Pelota",0),(diaDeSpa,120),(diaDeCampo,720)]
