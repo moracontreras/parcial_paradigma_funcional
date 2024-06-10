@@ -75,3 +75,41 @@ zara = UnPerro "Dalmata" ["Pelota","Mantita"] 90 80
 
 guarderiaPdePerritos :: Guarderia
 guarderiaPdePerritos = UnaGuarderia "GuarderíPdePerritos" [(jugar,30),(ladrar 18,20),(regalar "Pelota",0),(diaDeSpa,120),(diaDeCampo,720)]
+
+puedeEstarEnUnaGuarderia :: Perro->Guarderia->Bool
+puedeEstarEnUnaGuarderia (UnPerro _ _ tiempoAPermanecer _) (UnaGuarderia _ rutina) = (tiempoAPermanecer >=).tiempoTotalRutina $ rutina
+
+tiempoTotalRutina :: [Actividad]->Int
+tiempoTotalRutina unaRutina = sum. tiemposRutina $ unaRutina
+
+tiemposRutina :: [Actividad]->[Int]
+tiemposRutina unaRutina = map snd unaRutina
+
+responsables :: [Perro]->[Perro]
+responsables unosPerros = filter esResponsable unosPerros
+
+esResponsable :: Perro->Bool
+esResponsable unPerro = tieneMasDeTresJuguetes.diaDeCampo $ unPerro
+
+tieneMasDeTresJuguetes :: Perro->Bool
+tieneMasDeTresJuguetes unPerro = (>=3).length.juguetesFavoritos $ unPerro
+
+realizarRutina :: Perro->Guarderia->Perro
+realizarRutina unPerro unaGuarderia
+    | puedeEstarEnUnaGuarderia unPerro unaGuarderia = hacerRutina unPerro.rutina $ unaGuarderia
+    | otherwise = unPerro
+
+hacerRutina :: Perro->[Actividad]->Perro
+hacerRutina unPerro unaRutina = foldr ($) unPerro. ejerciciosRutina $ unaRutina
+
+ejerciciosRutina :: [Actividad]->[Ejercicio]
+ejerciciosRutina unaRutina = map  fst unaRutina 
+
+quedanCansados :: [Perro]->Guarderia->[Perro]
+quedanCansados unosPerros unaGuarderia= filter (quedaCansadoPostRutina unaGuarderia) unosPerros
+
+quedaCansadoPostRutina :: Guarderia->Perro->Bool
+quedaCansadoPostRutina unaGuarderia unPerro = tieneEnergiaMenorA5.flip realizarRutina unaGuarderia $ unPerro
+
+tieneEnergiaMenorA5 :: Perro->Bool
+tieneEnergiaMenorA5 (UnPerro _ _ _ energia)= energia <5
